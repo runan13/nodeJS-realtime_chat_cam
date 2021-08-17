@@ -19,15 +19,16 @@ const onSocketClose = () => {
   console.log("Disconnected to Client 🤑");
 };
 
-const onSocketMessage = (message) => {
-  console.log(message);
-};
+const sockets = [];
 
 wss.on("connection", (socket) => {
+  sockets.push(socket);
   console.log("Connected to Server 🚀");
   socket.on("close", onSocketClose);
-  socket.on("message", onSocketMessage);
-  socket.send("hello!");
+  socket.on("message", (data, isBinary) => {
+    const message = isBinary ? data : data.toString();
+    sockets.forEach((aSocket) => aSocket.send(message));
+  });
 });
 
 server.listen(3000, handleListen);
