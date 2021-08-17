@@ -1,6 +1,7 @@
 import express from "express";
 import http from "http";
 import WebSocket from "ws";
+import SocketIO from "socket.io";
 
 const app = express();
 
@@ -12,34 +13,39 @@ app.get("/*", (req, res) => res.redirect("/"));
 
 const handleListen = () => console.log(`Listening on http://localhost:3000`);
 
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const httpServer = http.createServer(app);
+// const wss = new WebSocket.Server({ server });
+const wsServer = SocketIO(httpServer);
 
-const onSocketClose = () => {
-  console.log("Disconnected to Client 🤑");
-};
-
-const sockets = [];
-
-wss.on("connection", (socket) => {
-  sockets.push(socket);
-  socket["nickname"] = "Anoun";
-  console.log("Connected to Server 🚀");
-  socket.on("close", onSocketClose);
-  socket.on("message", (data, isBinary) => {
-    const msg = isBinary ? data : data.toString();
-    const message = JSON.parse(msg);
-    switch (message.type) {
-      case "new_message":
-        sockets.forEach((aSocket) =>
-          aSocket.send(`${socket.nickname} : ${message.payload}`)
-        );
-        break;
-      case "nickname":
-        socket["nickname"] = message.payload;
-        break;
-    }
-  });
+wsServer.on("connection", (socket) => {
+  console.log(socket);
 });
 
-server.listen(3000, handleListen);
+// const onSocketClose = () => {
+//   console.log("Disconnected to Client 🤑");
+// };
+
+// const sockets = [];
+
+// wss.on("connection", (socket) => {
+//   sockets.push(socket);
+//   socket["nickname"] = "Anoun";
+//   console.log("Connected to Server 🚀");
+//   socket.on("close", onSocketClose);
+//   socket.on("message", (data, isBinary) => {
+//     const msg = isBinary ? data : data.toString();
+//     const message = JSON.parse(msg);
+//     switch (message.type) {
+//       case "new_message":
+//         sockets.forEach((aSocket) =>
+//           aSocket.send(`${socket.nickname} : ${message.payload}`)
+//         );
+//         break;
+//       case "nickname":
+//         socket["nickname"] = message.payload;
+//         break;
+//     }
+//   });
+// });
+
+httpServer.listen(3000, handleListen);
