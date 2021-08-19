@@ -60,11 +60,14 @@ wsServer.on("connection", (socket) => {
   });
   socket.on("disconnecting", () => {
     socket.rooms.forEach((room) =>
-      socket.to(room).emit("bye", socket.nickname, countRoom(roomName))
+      socket.to(room).emit("bye", socket.nickname)
     );
   });
   socket.on("disconnect", () => {
     wsServer.sockets.emit("room_change", publicRooms());
+    socket.rooms.forEach((room) =>
+      socket.to(room).emit("bye", socket.nickname, countRoom(roomName))
+    );
   });
   socket.on("new_message", (msg, room, done) => {
     socket.to(room).emit("new_message", `${socket.nickname} : ${msg}`);

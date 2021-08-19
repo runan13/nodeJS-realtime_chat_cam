@@ -5,6 +5,9 @@ const nickname = document.getElementById("nickname");
 const form = welcome.querySelector("form");
 const nameForm = nickname.querySelector("#name");
 const room = document.getElementById("room");
+const myFace = document.getElementById("myFace");
+const muteBtn = document.getElementById("mute");
+const cameraBtn = document.getElementById("camera");
 
 room.hidden = true;
 
@@ -81,3 +84,44 @@ socket.on("room_change", (rooms) => {
     roomList.append(li);
   });
 });
+
+let myStream;
+let muted = true;
+let cameraOff = true;
+
+const getMedia = async () => {
+  try {
+    myStream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: true,
+    });
+    myFace.srcObject = myStream;
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+getMedia();
+
+const handleMuteClick = () => {
+  if (!mute) {
+    muteBtn.innerText = "Mute";
+    mute = true;
+  } else {
+    muteBtn.innerText = "Unmute";
+    mute = false;
+  }
+};
+
+const handleCameraClick = () => {
+  if (!cameraOff) {
+    cameraBtn.innerText = "Camera On";
+    cameraOff = true;
+  } else {
+    cameraBtn.innerText = "Camera Off";
+    cameraOff = false;
+  }
+};
+
+muteBtn.addEventListener("click", handleMuteClick);
+cameraBtn.addEventListener("click", handleCameraClick);
